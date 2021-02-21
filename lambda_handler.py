@@ -39,8 +39,8 @@ def createDic(filterData):
     for element in filterData:
         dir = {
             'DC_NOME': element['DC_NOME'],
-            'TEMP': element['TEM_INS'],
-            'UMD': element['UMD_INS']
+            'TEMP': element['TEM_MED'],
+            'UMD': element['UMID_MED']
         }
         data.append(dir)
 
