@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import requests
 
-client = boto3.client("kinesis", "us-east-1")
 data = []
 dateHour = str(datetime.now())
 dir = {}
@@ -35,16 +34,23 @@ def parseJson(response):
 def createDic(filterData):
     for element in filterData:
        key = element['DC_NOME']
-       umd = element['UMD_MIN']
+       temp_ini = element['TEM_INS']
+       umd_ini = element['UMD_INS']
        if (key not in dir):
            dir[key] = []
-       dir[key].append(umd)
+       dir[key].append(temp_ini)
+       dir[key].append(umd_ini)
     data.append(dir)
 
-def sendData(client,data):
+def sendData(data):
+    client = boto3.client("kinesis", "us-east-1")
     client.put_records(
-        Records=[data, {"PartitionKey": "VALUE"}],
-        StreamName='weather_stream')
+        Records=[{
+            'Data': json.dumps({"message_type": data}),
+            'PartitionKey': 'key'
+        }],
+        StreamName="weather_stream",
+    )
     return {
         'statusCode': 200,
         'body': json.dumps('Datas sent to Kinesis Stream')
@@ -58,6 +64,6 @@ response = getResponse(date, hour)
 if (isResponseValid(response)):
     filterData = parseJson(response)
     createDic(filterData)
-   # print(data)
-   # sendData(client,data)
+    print(data)
+ #   sendData(data)
 
