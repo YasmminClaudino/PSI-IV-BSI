@@ -32,7 +32,7 @@ def isResponseValid(response):
 
 def parseJson(response):
     parseJsonData = response.json()
-    return [x for x in parseJsonData if x['UF'] == 'PE']
+    return filter(lambda x: x["UF"] == "PE", parseJsonData)
 
 
 def createDic(filterData):
