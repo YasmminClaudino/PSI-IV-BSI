@@ -10,18 +10,15 @@ dateHour = str(datetime.now())
 def getDate(date):
     return date[:10]
 
-
 def getHour(hour):
     hh = hour[11:13]
     mm = "00"
     return hh + mm
 
-
 def getResponse(date, hour):
     response = requests.get(
         f'https://apitempo.inmet.gov.br/estacao/dados/{date}/{hour}')
     return response
-
 
 def isResponseValid(response):
     if response.status_code == 200:
@@ -29,11 +26,9 @@ def isResponseValid(response):
     else:
         return print("Response is not valid " + str(response.status_code))
 
-
 def parseJson(response):
     parseJsonData = response.json()
     return filter(lambda x: x["UF"] == "PE", parseJsonData)
-
 
 def createDic(filterData):
     for element in filterData:
@@ -42,8 +37,8 @@ def createDic(filterData):
             'TEMP': element['TEM_INS'],
             'UMD': element['UMD_INS']
         }
+        #Add dir to list to not replace values
         data.append(dir)
-
 
 def sendData(data):
     client = boto3.client("kinesis", "us-east-1")
@@ -59,7 +54,6 @@ def sendData(data):
         'body': json.dumps('Datas sent to Kinesis Stream')
     }
 
-
 def lambda_handler(event, context):
     date = getDate(dateHour)
     hour = str(getHour(dateHour))
@@ -72,6 +66,6 @@ def lambda_handler(event, context):
         sendData(data)
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps(data)
     }
 
